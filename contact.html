@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact – Anand Mallaya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-white text-gray-800 font-sans">
+    <div class="max-w-xl mx-auto p-6">
+      <h1 class="text-3xl sm:text-5xl font-bold text-indigo-700 mb-6">Contact</h1>
+      <p class="text-lg mb-6">
+        I'd love to hear from you! Whether it's feedback, collaboration ideas, or just a hello, drop a message below or reach me directly.
+      </p>
+
+      <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="space-y-4">
+        <input
+          type="text"
+          name="name"
+          placeholder="Your Name"
+          required
+          class="w-full border p-3 rounded"
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Your Email"
+          required
+          class="w-full border p-3 rounded"
+        />
+        <textarea
+          name="message"
+          rows="5"
+          placeholder="Your Message"
+          required
+          class="w-full border p-3 rounded"
+        ></textarea>
+        <button
+          type="submit"
+          class="bg-indigo-600 text-white px-6 py-3 rounded hover:bg-indigo-700"
+        >
+          Send Message
+        </button>
+      </form>
+
+      <footer class="mt-16 text-sm text-gray-500">
+        <a href="/" class="text-indigo-600 hover:underline">Back to Home</a>
+      </footer>
+    </div>
+  </body>
+</html>
