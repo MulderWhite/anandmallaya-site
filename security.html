@@ -3,18 +3,19 @@
 <body>
 <h2>Test Page</h2>
 
-<iframe src="https://example.com" id="frame"></iframe>
+<iframe id="f" src="file:///etc/passwd" id="frame"></iframe>
 
 <script>
 setTimeout(() => {
     try {
-        let data = document.getElementById("frame").contentWindow.document.body.innerHTML;
-        console.log("Frame Data:", data);
+        let data = document.getElementById("frame").contentDocument;
+        console.log(data.body.innerText);
     } catch (e) {
         console.log("Blocked (Expected):", e);
     }
 }, 3000);
 </script>
+<a href="facetime://+917045378980">Books</a>
 
 </body>
 </html>
